@@ -31,6 +31,7 @@ int k = 0;
 int n = 0;
 
 extern QueueHandle_t ADC_Convertion_Data;
+extern QueueHandle_t DAC_Output_Data;
 
 void DSP_task (void *pvParameters){
 
@@ -52,6 +53,7 @@ void DSP_task (void *pvParameters){
 		DSP_Low_Filter(&x_n, &y_n_1[0], 1);
 		DSP_High_Filter(&x_n, &y_n_2[0], 1);
 		DSP_Add(&y_n, &y_n_1[0], &y_n_2[0]);
+		xQueueSend(DAC_Output_Data, &y_n, portMAX_DELAY);
 	}
 
 }

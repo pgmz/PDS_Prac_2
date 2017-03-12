@@ -32,7 +32,7 @@ void ADC_input_process_init()
 void ADC_Convertion_task(void *pvParameters)
 {
 	ADC_Convertion_Flag = xSemaphoreCreateBinary();
-	ADC_Convertion_Data = xQueueCreate(QUEUE_LENGTH, QUEUE_ITEM_SIZE);
+	ADC_Convertion_Data = xQueueCreate(ADC_QUEUE_LENGTH, ADC_QUEUE_ITEM_SIZE);
 
 	adc16_channel_config_t adc16ChannelConfigStruct;
 	adc16ChannelConfigStruct.channelNumber = 0U;
