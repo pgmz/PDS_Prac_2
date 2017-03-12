@@ -27,8 +27,8 @@ const static double h2_n_high_filter[7] = {
 		-0.08857280384687653
 };
 
-static int k = 0;
-static int n = 0;
+int k = 0;
+int n = 0;
 
 extern QueueHandle_t ADC_Convertion_Data;
 
@@ -37,11 +37,11 @@ void DSP_task (void *pvParameters){
 	double x_n;
 	double y_n;
 
-	static double y_n_1[7] = {
+	double y_n_1[7] = {
 			0,0,0,0,0,0,0
 	};
 
-	static double y_n_2[7] = {
+	double y_n_2[7] = {
 			0,0,0,0,0,0,0
 	};
 
@@ -57,31 +57,29 @@ void DSP_task (void *pvParameters){
 }
 
 void DSP_Amplitude (double * x_n, double Amlitude_factor){
-	*x_n = (*(x_n))*Amlitude_factor;
+	*x_n = Amlitude_factor*(*x_n);
 }
 
 void DSP_Low_Filter (double * x_n, double *y_n_1, double Amlitude_factor){
 
-	for(n=0;n++;n<=6)
+	for(n=0; n<6; n++)
 	{
-		*(y_n_1+n) = Amlitude_factor*(*(y_n_1+n+1) + (*x_n)*(h1_n_low_filter[n]));
+		*(y_n_1 + n) = Amlitude_factor*(*(y_n_1 + (n+1)) + (*x_n)*(h1_n_low_filter[n]));
 	}
 
 }
 
 void DSP_High_Filter (double * x_n, double *y_n_2, double Amlitude_factor){
 
-	for(n=0;n++;n<=6)
+	for(n=0; n<6; n++)
 	{
-		*(y_n_2+n) = Amlitude_factor*(*(y_n_2+n+1) + (*x_n)*(h2_n_high_filter[n]));
+		*(y_n_2 + n) = Amlitude_factor*(*(y_n_2 + (n+1)) + (*x_n)*(h2_n_high_filter[n]));
 	}
 
 }
 
 void DSP_Add (double * y_n, double * y_n_1, double *y_n_2){
-
 	*y_n = *(y_n_1) + *(y_n_2);
 	*(y_n_1) = 0;
 	*(y_n_2) = 0;
-
 }

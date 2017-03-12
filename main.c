@@ -66,7 +66,7 @@ int main(void) {
 
   /* Create RTOS task */
   xTaskCreate(ADC_Convertion_task, "ADC_Convertion", configMINIMAL_STACK_SIZE, NULL, hello_task_PRIORITY, NULL);
-  xTaskCreate(DSP_task, "DSP", configMINIMAL_STACK_SIZE, NULL, hello_task_PRIORITY, NULL);
+  xTaskCreate(DSP_task, "DSP", configMINIMAL_STACK_SIZE, NULL, hello_task_PRIORITY-1, NULL);
 
   vTaskStartScheduler();
 

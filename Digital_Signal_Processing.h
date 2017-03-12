@@ -8,6 +8,8 @@
 #ifndef SOURCE_DIGITAL_SIGNAL_PROCESSING_H_
 #define SOURCE_DIGITAL_SIGNAL_PROCESSING_H_
 
+#include "fsl_debug_console.h"
+
 #include "FreeRTOS.h"
 #include "queue.h"
 #include "semphr.h"

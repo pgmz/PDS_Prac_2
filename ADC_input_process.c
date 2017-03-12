@@ -39,11 +39,18 @@ void ADC_Convertion_task(void *pvParameters)
 	adc16ChannelConfigStruct.enableDifferentialConversion = false;
 	adc16ChannelConfigStruct.enableInterruptOnConversionCompleted = true;
 
+	TickType_t xLastWakeTime;
+	xLastWakeTime = xTaskGetTickCount();
+
 	ADC16_SetChannelConfig(ADC0, 0, &adc16ChannelConfigStruct);
 	for(;;)
 	{
 		xSemaphoreTake(ADC_Convertion_Flag, portMAX_DELAY);
+
+		vTaskDelayUntil(&xLastWakeTime, 10);
+
 		ADC16_SetChannelConfig(ADC0, 0, &adc16ChannelConfigStruct);
+
 	}
 }
 
