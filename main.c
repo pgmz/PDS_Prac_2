@@ -39,6 +39,7 @@
 #include "clock_config.h"
 /*#include "fsl_debug_console.h"*/
 #include "ADC_input_process.h"
+#include "Digital_Signal_Processing.h"
 
 /* FreeRTOS kernel includes. */
 #include "FreeRTOS.h"
@@ -65,6 +66,8 @@ int main(void) {
 
   /* Create RTOS task */
   xTaskCreate(ADC_Convertion_task, "ADC_Convertion", configMINIMAL_STACK_SIZE, NULL, hello_task_PRIORITY, NULL);
+  xTaskCreate(DSP_task, "DSP", configMINIMAL_STACK_SIZE, NULL, hello_task_PRIORITY, NULL);
+
   vTaskStartScheduler();
 
 

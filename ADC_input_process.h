@@ -14,9 +14,10 @@
 #include "semphr.h"
 #include "timers.h"
 
+#define ADC_Convert_Volt(ADC_Data)	(double)((3.3)*((ADC_Data)/4095))
 
 #define QUEUE_LENGTH	5
-#define QUEUE_ITEM_SIZE	sizeof(uint32_t)
+#define QUEUE_ITEM_SIZE	sizeof(double)
 
 void ADC_input_process_init();
 void ADC_Convertion_task(void *pvParameters);

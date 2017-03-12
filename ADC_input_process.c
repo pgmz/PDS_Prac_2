@@ -10,14 +10,6 @@
 SemaphoreHandle_t ADC_Convertion_Flag;
 QueueHandle_t ADC_Convertion_Data;
 
-void ADC0_IRQHandler ()
-{
-	BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-	xSemaphoreGiveFromISR(ADC_Convertion_Flag, &pxHigherPriorityTaskWoken);
-	uint32_t data = ADC16_GetChannelConversionValue(ADC0, 0U);
-	xQueueSendFromISR(ADC_Convertion_Data, &data, &pxHigherPriorityTaskWoken);
-}
-
 void ADC_input_process_init()
 {
 
@@ -54,3 +46,12 @@ void ADC_Convertion_task(void *pvParameters)
 		ADC16_SetChannelConfig(ADC0, 0, &adc16ChannelConfigStruct);
 	}
 }
+
+void ADC0_IRQHandler ()
+{
+	BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
+	xSemaphoreGiveFromISR(ADC_Convertion_Flag, &pxHigherPriorityTaskWoken);
+	double data = ADC_Convert_Volt(ADC16_GetChannelConversionValue(ADC0, 0U));
+	xQueueSendFromISR(ADC_Convertion_Data, &data, &pxHigherPriorityTaskWoken);
+}
+
