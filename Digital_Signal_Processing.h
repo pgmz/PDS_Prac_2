@@ -15,6 +15,9 @@
 #include "semphr.h"
 #include "timers.h"
 
+#define DAC_QUEUE_LENGTH	5
+#define DAC_QUEUE_ITEM_SIZE	sizeof(double)
+
 void DSP_task (void *pvParameters);
 void DSP_Amplitude (double * x_n, double Amlitude_factor);
 void DSP_Low_Filter (double * x_n, double *y_n_1, double Amlitude_factor);

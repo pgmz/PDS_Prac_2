@@ -47,7 +47,7 @@ void ADC_Convertion_task(void *pvParameters)
 	{
 		xSemaphoreTake(ADC_Convertion_Flag, portMAX_DELAY);
 
-		vTaskDelayUntil(&xLastWakeTime, 10);
+		vTaskDelayUntil(&xLastWakeTime, 100);
 
 		ADC16_SetChannelConfig(ADC0, 0, &adc16ChannelConfigStruct);
 

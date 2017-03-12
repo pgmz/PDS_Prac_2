@@ -7,7 +7,7 @@
 
 #include "DAC_output_process.h"
 
-QueueHandle_t DAC_Output_Data;
+extern QueueHandle_t DAC_Output_Data;
 
 void DAC_output_process_init(){
 
@@ -22,7 +22,6 @@ void DAC_output_process_init(){
 
 void DAC_output_task(void *pvParameters){
 
-	DAC_Output_Data = xQueueCreate(DAC_QUEUE_LENGTH, DAC_QUEUE_ITEM_SIZE);
 	uint32_t DAC_Output_Processed;
 
 	for(;;)

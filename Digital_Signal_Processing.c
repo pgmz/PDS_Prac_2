@@ -31,7 +31,7 @@ int k = 0;
 int n = 0;
 
 extern QueueHandle_t ADC_Convertion_Data;
-extern QueueHandle_t DAC_Output_Data;
+QueueHandle_t DAC_Output_Data;
 
 void DSP_task (void *pvParameters){
 
@@ -45,6 +45,8 @@ void DSP_task (void *pvParameters){
 	double y_n_2[7] = {
 			0,0,0,0,0,0,0
 	};
+
+	DAC_Output_Data = xQueueCreate(DAC_QUEUE_LENGTH, DAC_QUEUE_ITEM_SIZE);
 
 	for(;;)
 	{
@@ -64,7 +66,7 @@ void DSP_Amplitude (double * x_n, double Amlitude_factor){
 
 void DSP_Low_Filter (double * x_n, double *y_n_1, double Amlitude_factor){
 
-	for(n=0; n<6; n++)
+	for(n=0; n<7; n++)
 	{
 		*(y_n_1 + n) = Amlitude_factor*(*(y_n_1 + (n+1)) + (*x_n)*(h1_n_low_filter[n]));
 	}
@@ -73,7 +75,7 @@ void DSP_Low_Filter (double * x_n, double *y_n_1, double Amlitude_factor){
 
 void DSP_High_Filter (double * x_n, double *y_n_2, double Amlitude_factor){
 
-	for(n=0; n<6; n++)
+	for(n=0; n<7; n++)
 	{
 		*(y_n_2 + n) = Amlitude_factor*(*(y_n_2 + (n+1)) + (*x_n)*(h2_n_high_filter[n]));
 	}

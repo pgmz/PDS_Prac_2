@@ -12,8 +12,8 @@
 #include "FreeRTOS.h"
 #include "queue.h"
 
-#define DAC_QUEUE_LENGTH	5
-#define DAC_QUEUE_ITEM_SIZE	sizeof(double)
+void DAC_output_process_init();
+void DAC_output_task(void *pvParameters);
 
 
 #endif /* SOURCE_DAC_OUTPUT_PROCESS_H_ */
