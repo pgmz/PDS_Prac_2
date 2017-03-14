@@ -19,10 +19,10 @@ static Mod_SM_type Mod_SM[4] = {
 };
 
 
-double *Amp_General = &Mod_SM[Amplitude].Modifier;
-double *Amp_Low_Filter =  &Mod_SM[LP_amplitude].Modifier;
-double *Amp_High_Filter =  &Mod_SM[HP_amplitude].Modifier;
-double *Sampling_period =  &Mod_SM[Sampling_frec].Modifier;
+float *Amp_General = &Mod_SM[Amplitude].Modifier;
+float *Amp_Low_Filter =  &Mod_SM[LP_amplitude].Modifier;
+float *Amp_High_Filter =  &Mod_SM[HP_amplitude].Modifier;
+float *Sampling_period =  &Mod_SM[Sampling_frec].Modifier;
 
 void External_mod_process_init(){
 	  CLOCK_EnableClock(kCLOCK_PortC);
@@ -104,13 +104,13 @@ void Modify_sampling(uint8_t Increment){
 		if(Mod_SM[Current_state].Modifier == 100){
 			return;
 		} else {
-			Mod_SM[Current_state].Modifier += 5;
+			Mod_SM[Current_state].Modifier += 1;
 		}
 	} else if(Increment){
 		if(Mod_SM[Current_state].Modifier == 15){
 			return;
 		} else {
-			Mod_SM[Current_state].Modifier -= 5;
+			Mod_SM[Current_state].Modifier -= 1;
 		}
 	}
 

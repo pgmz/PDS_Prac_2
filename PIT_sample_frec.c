@@ -7,25 +7,22 @@
 
 #include "PIT_sample_frec.h"
 
-SemaphoreHandle_t ADC_Sampling_Flag;
+uint8_t ADC_Sampling_Flag = false;
 
 void PIT0_IRQHandler(void)
 {
     PIT_ClearStatusFlags(PIT, kPIT_Chnl_0, kPIT_TimerFlag);
-	BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-	xSemaphoreGiveFromISR(ADC_Sampling_Flag, &pxHigherPriorityTaskWoken);
+    ADC_Sampling_Flag = true;
 }
 
 
 void PIT_sample_frec_init(){
 
-	ADC_Sampling_Flag = xSemaphoreCreateBinary();
-
     pit_config_t pitConfig;
     PIT_GetDefaultConfig(&pitConfig);
     PIT_Init(PIT, &pitConfig);
 
-    PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, USEC_TO_COUNT(22U, CLOCK_GetFreq(kCLOCK_BusClk)));
+    PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, USEC_TO_COUNT(25U, CLOCK_GetFreq(kCLOCK_BusClk)));
 
     PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
 

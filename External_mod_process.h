@@ -23,7 +23,7 @@ typedef enum {
 typedef struct {
 	Mod_State_type Mod_State;
 	Mod_State_type Mod_Next;
-	double Modifier;
+	float Modifier;
 	void (*ftpr)(uint8_t);
 	uint8_t led1 :1;
 	uint8_t led2 :1;

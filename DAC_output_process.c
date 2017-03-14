@@ -7,9 +7,7 @@
 
 #include "DAC_output_process.h"
 
-extern double y_n;
-
-
+extern float y_n;
 uint16_t DAC_data;
 
 void DAC_output_process_init(){
@@ -24,6 +22,6 @@ void DAC_output_process_init(){
 }
 
 void DAC_output_task(){
-		DAC_data = DAC_Convert_Volt(y_n);
-		DAC_SetBufferValue(DAC0, 0U, DAC_data);
+		//DAC_data = DAC_Convert_Volt(y_n);
+		DAC_SetBufferValue(DAC0, 0U, (uint16_t)y_n);
 }

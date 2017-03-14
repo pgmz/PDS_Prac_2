@@ -7,15 +7,15 @@
 
 #include "ADC_input_process.h"
 
-extern SemaphoreHandle_t ADC_Sampling_Flag;
-SemaphoreHandle_t ADC_Convertion_Flag;
+extern uint8_t ADC_Sampling_Flag;
+uint8_t ADC_Convertion_Flag = false;
 
-double ADC_data;
+float ADC_data;
 
 void ADC_input_process_init()
 {
 
-	NVIC_SetPriority(ADC0_IRQn, 7);
+	NVIC_SetPriority(ADC0_IRQn, 5);
 	NVIC_EnableIRQ(ADC0_IRQn);
 
 	adc16_config_t adc16ConfigStruct;
@@ -34,32 +34,29 @@ void ADC_input_process_init()
 
 void ADC_Convertion_task(void *pvParameters)
 {
-	ADC_Convertion_Flag = xSemaphoreCreateBinary();
 
 	adc16_channel_config_t adc16ChannelConfigStruct;
 	adc16ChannelConfigStruct.channelNumber = 0U;
 	adc16ChannelConfigStruct.enableDifferentialConversion = false;
 	adc16ChannelConfigStruct.enableInterruptOnConversionCompleted = true;
 
-	ADC16_SetChannelConfig(ADC0, 0, &adc16ChannelConfigStruct);
 	for(;;)
 	{
-		xSemaphoreTake(ADC_Convertion_Flag, portMAX_DELAY);
 
+		while(ADC_Sampling_Flag == false);
+		ADC_Sampling_Flag = false;
+		ADC16_SetChannelConfig(ADC0, 0, &adc16ChannelConfigStruct);
+		while(ADC_Convertion_Flag == false);
+		ADC_Convertion_Flag = false;
 		DSP_task ();
 		DAC_output_task();
-
-		xSemaphoreTake(ADC_Sampling_Flag, portMAX_DELAY);
-
-		ADC16_SetChannelConfig(ADC0, 0, &adc16ChannelConfigStruct);
 
 	}
 }
 
 void ADC0_IRQHandler ()
 {
-	BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-	xSemaphoreGiveFromISR(ADC_Convertion_Flag, &pxHigherPriorityTaskWoken);
-	ADC_data = ADC_Convert_Volt(ADC16_GetChannelConversionValue(ADC0, 0U));
+	ADC_Convertion_Flag = true;
+	ADC_data = (ADC16_GetChannelConversionValue(ADC0, 0U));
 }
 
