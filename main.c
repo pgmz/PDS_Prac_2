@@ -39,21 +39,20 @@
 #include "clock_config.h"
 /*#include "fsl_debug_console.h"*/
 #include "ADC_input_process.h"
-#include "Digital_Signal_Processing.h"
-#include "DAC_output_process.h"
+#include "External_mod_process.h"
+#include "PIT_sample_frec.h"
 
 /* FreeRTOS kernel includes. */
 #include "FreeRTOS.h"
 #include "task.h"
-#include "queue.h"
 #include "timers.h"
 #include "semphr.h"
 
 
 /* Task priorities. */
-#define ADC_DATA_REP_PRIORITY (configMAX_PRIORITIES - 1)
+#define ADC_DATA_REP_PRIORITY (configMAX_PRIORITIES - 3)
 #define DSP_PRIORITY (configMAX_PRIORITIES - 2)
-#define DAC_OUT_PRIORITY (configMAX_PRIORITIES - 2)
+#define DAC_OUT_PRIORITY (configMAX_PRIORITIES - 1)
 
 /*!
  * @brief Application entry point.
@@ -65,14 +64,15 @@ int main(void) {
   BOARD_InitDebugConsole();
 
   /* Add your code here */
+  PIT_sample_frec_init();
   ADC_input_process_init();
   DAC_output_process_init();
+  External_mod_process_init();
 
   /* Create RTOS task */
   xTaskCreate(ADC_Convertion_task, "ADC_Convertion", configMINIMAL_STACK_SIZE, NULL, ADC_DATA_REP_PRIORITY, NULL);
-  xTaskCreate(DSP_task, "DSP", configMINIMAL_STACK_SIZE, NULL, DSP_PRIORITY, NULL);
-  xTaskCreate(DAC_output_task, "DAC_Output", configMINIMAL_STACK_SIZE, NULL, DAC_OUT_PRIORITY, NULL);
 
+  PIT_sample_frec_start();
   vTaskStartScheduler();
 
 

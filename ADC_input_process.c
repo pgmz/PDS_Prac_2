@@ -7,13 +7,15 @@
 
 #include "ADC_input_process.h"
 
+extern SemaphoreHandle_t ADC_Sampling_Flag;
 SemaphoreHandle_t ADC_Convertion_Flag;
-QueueHandle_t ADC_Convertion_Data;
+
+double ADC_data;
 
 void ADC_input_process_init()
 {
 
-	NVIC_SetPriority(ADC0_IRQn, 5);
+	NVIC_SetPriority(ADC0_IRQn, 7);
 	NVIC_EnableIRQ(ADC0_IRQn);
 
 	adc16_config_t adc16ConfigStruct;
@@ -22,6 +24,7 @@ void ADC_input_process_init()
 
 	adc16ConfigStruct.referenceVoltageSource = kADC16_ReferenceVoltageSourceVref;
 	adc16ConfigStruct.resolution = kADC16_ResolutionSE12Bit;
+	adc16ConfigStruct.clockDivider = kADC16_ClockDivider1;
 
 	ADC16_Init(ADC0, &adc16ConfigStruct);
 	ADC16_EnableHardwareTrigger(ADC0, false);
@@ -32,22 +35,21 @@ void ADC_input_process_init()
 void ADC_Convertion_task(void *pvParameters)
 {
 	ADC_Convertion_Flag = xSemaphoreCreateBinary();
-	ADC_Convertion_Data = xQueueCreate(ADC_QUEUE_LENGTH, ADC_QUEUE_ITEM_SIZE);
 
 	adc16_channel_config_t adc16ChannelConfigStruct;
 	adc16ChannelConfigStruct.channelNumber = 0U;
 	adc16ChannelConfigStruct.enableDifferentialConversion = false;
 	adc16ChannelConfigStruct.enableInterruptOnConversionCompleted = true;
 
-	TickType_t xLastWakeTime;
-	xLastWakeTime = xTaskGetTickCount();
-
 	ADC16_SetChannelConfig(ADC0, 0, &adc16ChannelConfigStruct);
 	for(;;)
 	{
 		xSemaphoreTake(ADC_Convertion_Flag, portMAX_DELAY);
 
-		vTaskDelayUntil(&xLastWakeTime, 100);
+		DSP_task ();
+		DAC_output_task();
+
+		xSemaphoreTake(ADC_Sampling_Flag, portMAX_DELAY);
 
 		ADC16_SetChannelConfig(ADC0, 0, &adc16ChannelConfigStruct);
 
@@ -58,7 +60,6 @@ void ADC0_IRQHandler ()
 {
 	BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
 	xSemaphoreGiveFromISR(ADC_Convertion_Flag, &pxHigherPriorityTaskWoken);
-	double data = ADC_Convert_Volt(ADC16_GetChannelConversionValue(ADC0, 0U));
-	xQueueSendFromISR(ADC_Convertion_Data, &data, &pxHigherPriorityTaskWoken);
+	ADC_data = ADC_Convert_Volt(ADC16_GetChannelConversionValue(ADC0, 0U));
 }
 

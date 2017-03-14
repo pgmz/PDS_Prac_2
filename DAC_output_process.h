@@ -10,10 +10,12 @@
 
 #include "fsl_dac.h"
 #include "FreeRTOS.h"
-#include "queue.h"
+#include "semphr.h"
+
+#define DAC_Convert_Volt(DAC_Data)		((uint16_t)((4095/3.3)*(DAC_Data)))
 
 void DAC_output_process_init();
-void DAC_output_task(void *pvParameters);
+void DAC_output_task();
 
 
 #endif /* SOURCE_DAC_OUTPUT_PROCESS_H_ */

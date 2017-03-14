@@ -27,63 +27,45 @@ const static double h2_n_high_filter[7] = {
 		-0.08857280384687653
 };
 
-int k = 0;
 int n = 0;
 
-extern QueueHandle_t ADC_Convertion_Data;
-QueueHandle_t DAC_Output_Data;
+double y_n;
+double x_n;
+double y_n_1[7] = {
+		0,0,0,0,0,0,0
+};
 
-void DSP_task (void *pvParameters){
+double y_n_2[7] = {
+		0,0,0,0,0,0,0
+};
+extern double ADC_data;
+extern double *Amp_General;
+extern double *Amp_Low_Filter;
+extern double *Amp_High_Filter;
 
-	double x_n;
-	double y_n;
-
-	double y_n_1[7] = {
-			0,0,0,0,0,0,0
-	};
-
-	double y_n_2[7] = {
-			0,0,0,0,0,0,0
-	};
-
-	DAC_Output_Data = xQueueCreate(DAC_QUEUE_LENGTH, DAC_QUEUE_ITEM_SIZE);
-
-	for(;;)
-	{
-		xQueueReceive(ADC_Convertion_Data, &x_n, portMAX_DELAY);
-		DSP_Amplitude(&x_n, 1);
-		DSP_Low_Filter(&x_n, &y_n_1[0], 1);
-		DSP_High_Filter(&x_n, &y_n_2[0], 1);
-		DSP_Add(&y_n, &y_n_1[0], &y_n_2[0]);
-		xQueueSend(DAC_Output_Data, &y_n, portMAX_DELAY);
-	}
-
+void DSP_task (){
+	x_n = 2*ADC_data - 1;
+	DSP_Amplitude(&x_n, (*Amp_General));
+	DSP_Filter(&x_n, &y_n_1[0], &h1_n_low_filter[0], (*Amp_Low_Filter));
+	DSP_Filter(&x_n, &y_n_2[0], &h2_n_high_filter[0], (*Amp_High_Filter));
+	DSP_Add(&y_n, &y_n_1[0], &y_n_2[0]);
 }
 
-void DSP_Amplitude (double * x_n, double Amlitude_factor){
-	*x_n = Amlitude_factor*(*x_n);
+void DSP_Amplitude (double * x_n, double Amplitude_factor){
+	*x_n = Amplitude_factor*(*x_n);
 }
 
-void DSP_Low_Filter (double * x_n, double *y_n_1, double Amlitude_factor){
+void DSP_Filter (double * x_n, double *y_n, const double *h_n, double Amplitude_factor){
 
 	for(n=0; n<7; n++)
 	{
-		*(y_n_1 + n) = Amlitude_factor*(*(y_n_1 + (n+1)) + (*x_n)*(h1_n_low_filter[n]));
-	}
-
-}
-
-void DSP_High_Filter (double * x_n, double *y_n_2, double Amlitude_factor){
-
-	for(n=0; n<7; n++)
-	{
-		*(y_n_2 + n) = Amlitude_factor*(*(y_n_2 + (n+1)) + (*x_n)*(h2_n_high_filter[n]));
+		*(y_n + n) = Amplitude_factor*(*(y_n + (n+1)) + (*x_n)*(h_n[n]));
 	}
 
 }
 
 void DSP_Add (double * y_n, double * y_n_1, double *y_n_2){
-	*y_n = *(y_n_1) + *(y_n_2);
+	*y_n = (*(y_n_1) + *(y_n_2))/2 + 1;
 	*(y_n_1) = 0;
 	*(y_n_2) = 0;
 }

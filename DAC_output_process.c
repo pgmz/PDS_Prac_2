@@ -7,7 +7,10 @@
 
 #include "DAC_output_process.h"
 
-extern QueueHandle_t DAC_Output_Data;
+extern double y_n;
+
+
+uint16_t DAC_data;
 
 void DAC_output_process_init(){
 
@@ -20,13 +23,7 @@ void DAC_output_process_init(){
 
 }
 
-void DAC_output_task(void *pvParameters){
-
-	uint32_t DAC_Output_Processed;
-
-	for(;;)
-	{
-		xQueueReceive(DAC_Output_Data, &DAC_Output_Processed, portMAX_DELAY);
-		DAC_SetBufferValue(DAC0, 0U, (uint16_t)DAC_Output_Processed);
-	}
+void DAC_output_task(){
+		DAC_data = DAC_Convert_Volt(y_n);
+		DAC_SetBufferValue(DAC0, 0U, DAC_data);
 }
