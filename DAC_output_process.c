@@ -22,6 +22,6 @@ void DAC_output_process_init(){
 }
 
 void DAC_output_task(){
-		//DAC_data = DAC_Convert_Volt(y_n);
+		/*Sacar valor por DAC**/
 		DAC_SetBufferValue(DAC0, 0U, (uint16_t)y_n);
 }

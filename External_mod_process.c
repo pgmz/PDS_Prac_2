@@ -11,6 +11,7 @@ uint32_t PORTC_INT_FLAGS;
 
 Mod_State_type Current_state = Amplitude;
 
+/*Maquina de estados*/
 static Mod_SM_type Mod_SM[4] = {
 		{Amplitude, LP_amplitude, 1, &Modify_amplitude, false, false, true},
 		{LP_amplitude, HP_amplitude, 1, &Modify_amplitude, true, false, false},
@@ -19,12 +20,16 @@ static Mod_SM_type Mod_SM[4] = {
 };
 
 
+/*Donde están los valores que modifican el sistema**/
 float *Amp_General = &Mod_SM[Amplitude].Modifier;
 float *Amp_Low_Filter =  &Mod_SM[LP_amplitude].Modifier;
 float *Amp_High_Filter =  &Mod_SM[HP_amplitude].Modifier;
 float *Sampling_period =  &Mod_SM[Sampling_frec].Modifier;
 
 void External_mod_process_init(){
+
+	/*Init botones y LEDS**/
+
 	  CLOCK_EnableClock(kCLOCK_PortC);
 
 		port_pin_config_t config =
@@ -119,8 +124,12 @@ void Modify_sampling(uint8_t Increment){
 
 void PORTC_IRQHandler(){
 
+	/*De acuerdo al boton oprimido cambiar amplitud, estado o frecuencia de muestreo**/
+
 	PORTC_INT_FLAGS = GPIO_GetPinsInterruptFlags(GPIOC);
 	PORT_ClearPinsInterruptFlags(PORTC, ~0U);
+
+	/*Cambiar estado y actualizar LEDS**/
 	switch(PORTC_INT_FLAGS){
 	case 1<<7U:
 			Current_state = Mod_SM[Current_state].Mod_Next;
@@ -129,10 +138,12 @@ void PORTC_IRQHandler(){
 			GPIO_WritePinOutput(BOARD_LED_GREEN_GPIO, BOARD_LED_GREEN_GPIO_PIN, Mod_SM[Current_state].led3);
 		    break;
 
+    /*Incrementar de acuerdo al estado**/
 	case 1<<0U:
 			Mod_SM[Current_state].ftpr(true);
 			break;
 
+	/*Decrementar de acuerdo al estado**/
 	case 1<<9U:
 			Mod_SM[Current_state].ftpr(false);
 			break;

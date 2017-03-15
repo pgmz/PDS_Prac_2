@@ -15,6 +15,7 @@ float ADC_data;
 void ADC_input_process_init()
 {
 
+	/*Init ADC**/
 	NVIC_SetPriority(ADC0_IRQn, 5);
 	NVIC_EnableIRQ(ADC0_IRQn);
 
@@ -35,6 +36,7 @@ void ADC_input_process_init()
 void ADC_Convertion_task(void *pvParameters)
 {
 
+	/* Init canal de ADC**/
 	adc16_channel_config_t adc16ChannelConfigStruct;
 	adc16ChannelConfigStruct.channelNumber = 0U;
 	adc16ChannelConfigStruct.enableDifferentialConversion = false;
@@ -43,11 +45,16 @@ void ADC_Convertion_task(void *pvParameters)
 	for(;;)
 	{
 
+		/*Mientras no haya pasado el periodo de muestreo, detenerse**/
 		while(ADC_Sampling_Flag == false);
 		ADC_Sampling_Flag = false;
+
+		/*Empezar conversión y esperar a que termine**/
 		ADC16_SetChannelConfig(ADC0, 0, &adc16ChannelConfigStruct);
 		while(ADC_Convertion_Flag == false);
 		ADC_Convertion_Flag = false;
+
+		/*Procesar y sacar por DAC**/
 		DSP_task ();
 		DAC_output_task();
 

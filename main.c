@@ -51,8 +51,7 @@
 
 /* Task priorities. */
 #define ADC_DATA_REP_PRIORITY (configMAX_PRIORITIES - 3)
-#define DSP_PRIORITY (configMAX_PRIORITIES - 2)
-#define DAC_OUT_PRIORITY (configMAX_PRIORITIES - 1)
+
 
 /*!
  * @brief Application entry point.
@@ -64,6 +63,8 @@ int main(void) {
   BOARD_InitDebugConsole();
 
   /* Add your code here */
+
+  /*Inicializar modulos*/
   PIT_sample_frec_init();
   ADC_input_process_init();
   DAC_output_process_init();
@@ -72,7 +73,10 @@ int main(void) {
   /* Create RTOS task */
   xTaskCreate(ADC_Convertion_task, "ADC_Convertion", configMINIMAL_STACK_SIZE, NULL, ADC_DATA_REP_PRIORITY, NULL);
 
+  /*Empezar timer del PIT*/
   PIT_sample_frec_start();
+
+  /*Empezar sistema*/
   vTaskStartScheduler();
 
 
