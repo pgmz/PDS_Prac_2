@@ -14,16 +14,22 @@
 #include "board.h"
 
 typedef enum {
-	Amplitude,
-	LP_amplitude,
-	HP_amplitude,
-	Sampling_frec
+	R_PARAM,
+	A_PARAM
 }Mod_State_type;
+
+#define R_PARAM_MAX	13500
+#define R_PARAM_MIN	100
+#define A_PARAM_MAX	0.9
+#define A_PARAM_MIN 0.1
 
 typedef struct {
 	Mod_State_type Mod_State;
 	Mod_State_type Mod_Next;
 	float Modifier;
+	float Modifier_inc;
+	float Modifier_max;
+	float Modifier_min;
 	void (*ftpr)(uint8_t);
 	uint8_t led1 :1;
 	uint8_t led2 :1;

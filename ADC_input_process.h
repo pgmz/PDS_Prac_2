@@ -18,7 +18,7 @@
 #include "timers.h"
 
 void ADC_input_process_init();
-void ADC_Convertion_task(void *pvParameters);
+void ADC_Convertion_task();
 
 
 #endif /* SOURCE_ADC_INPUT_PROCESS_H_ */
