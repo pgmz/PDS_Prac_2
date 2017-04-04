@@ -9,19 +9,22 @@
 
 uint32_t PORTC_INT_FLAGS;
 
-Mod_State_type Current_state = R_PARAM;
+Mod_State_type Current_state = Amplitude;
 
 /*Maquina de estados*/
 static Mod_SM_type Mod_SM[4] = {
-		{R_PARAM, A_PARAM, 200, R_PARAM_MIN, R_PARAM_MAX, R_PARAM_MIN,&Modify_amplitude, false, false, true},
-		{A_PARAM, R_PARAM, 0.5, A_PARAM_MIN, A_PARAM_MAX, A_PARAM_MIN,&Modify_amplitude, true, false, false}
+		{Amplitude, LP_amplitude, 1, &Modify_amplitude, false, false, true},
+		{LP_amplitude, HP_amplitude, 1, &Modify_amplitude, true, false, false},
+		{HP_amplitude, Sampling_frec, 1, &Modify_amplitude, false, true, false},
+		{Sampling_frec, Amplitude, 25, &Modify_sampling, false, false, false}
 };
 
 
 /*Donde están los valores que modifican el sistema**/
-float *R_param = &Mod_SM[R_PARAM].Modifier;
-float *A_param =  &Mod_SM[A_PARAM].Modifier;
-
+float *Amp_General = &Mod_SM[Amplitude].Modifier;
+float *Amp_Low_Filter =  &Mod_SM[LP_amplitude].Modifier;
+float *Amp_High_Filter =  &Mod_SM[HP_amplitude].Modifier;
+float *Sampling_period =  &Mod_SM[Sampling_frec].Modifier;
 
 void External_mod_process_init(){
 
@@ -101,18 +104,36 @@ void External_mod_process_init(){
 
 void Modify_amplitude(uint8_t Increment){
 	if(Increment){
-		if(Mod_SM[Current_state].Modifier >= Mod_SM[Current_state].Modifier_max){
-			Mod_SM[Current_state].Modifier = Mod_SM[Current_state].Modifier_max;
+		if(Mod_SM[Current_state].Modifier >= 1){
+			Mod_SM[Current_state].Modifier = 1;
 		} else {
-			Mod_SM[Current_state].Modifier += Mod_SM[Current_state].Modifier_inc;
+			Mod_SM[Current_state].Modifier += 0.1;
 		}
 	} else if(Increment == false){
-		if(Mod_SM[Current_state].Modifier <= Mod_SM[Current_state].Modifier_min){
-			Mod_SM[Current_state].Modifier = Mod_SM[Current_state].Modifier_min;
+		if(Mod_SM[Current_state].Modifier <= 0){
+			Mod_SM[Current_state].Modifier = 0;
 		} else {
-			Mod_SM[Current_state].Modifier -= Mod_SM[Current_state].Modifier_inc;
+			Mod_SM[Current_state].Modifier -= 0.1;
 		}
 	}
+}
+
+void Modify_sampling(uint8_t Increment){
+	if(Increment == false){
+		if(Mod_SM[Current_state].Modifier == 100){
+			return;
+		} else {
+			Mod_SM[Current_state].Modifier += 1;
+		}
+	} else if(Increment){
+		if(Mod_SM[Current_state].Modifier == 15){
+			return;
+		} else {
+			Mod_SM[Current_state].Modifier -= 1;
+		}
+	}
+
+    PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, USEC_TO_COUNT(Mod_SM[Current_state].Modifier, CLOCK_GetFreq(kCLOCK_BusClk)));
 }
 
 void PORTC_IRQHandler(){

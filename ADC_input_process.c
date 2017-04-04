@@ -33,7 +33,7 @@ void ADC_input_process_init()
 	ADC16_DoAutoCalibration(ADC0);
 }
 
-void ADC_Convertion_task()
+void ADC_Convertion_task(void *pvParameters)
 {
 
 	/* Init canal de ADC**/
@@ -46,8 +46,8 @@ void ADC_Convertion_task()
 	{
 
 		/*Mientras no haya pasado el periodo de muestreo, detenerse**/
-		//while(ADC_Sampling_Flag == false);
-		//ADC_Sampling_Flag = false;
+		while(ADC_Sampling_Flag == false);
+		ADC_Sampling_Flag = false;
 
 		/*Empezar conversión y esperar a que termine**/
 		ADC16_SetChannelConfig(ADC0, 0, &adc16ChannelConfigStruct);
@@ -55,7 +55,7 @@ void ADC_Convertion_task()
 		ADC_Convertion_Flag = false;
 
 		/*Procesar y sacar por DAC**/
-		DSP_task();
+		DSP_task ();
 		DAC_output_task();
 
 	}

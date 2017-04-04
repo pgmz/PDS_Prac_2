@@ -65,18 +65,23 @@ int main(void) {
   /* Add your code here */
 
   /*Inicializar modulos*/
-  //PIT_sample_frec_init();
+  PIT_sample_frec_init();
   ADC_input_process_init();
   DAC_output_process_init();
   External_mod_process_init();
 
-  /*Empezar timer del PIT*/
-  //PIT_sample_frec_start();
+  /* Create RTOS task */
+  xTaskCreate(ADC_Convertion_task, "ADC_Convertion", configMINIMAL_STACK_SIZE, NULL, ADC_DATA_REP_PRIORITY, NULL);
 
+  /*Empezar timer del PIT*/
+  PIT_sample_frec_start();
+
+  /*Empezar sistema*/
+  vTaskStartScheduler();
 
 
   for(;;) { /* Infinite loop to avoid leaving the main function */
-	  ADC_Convertion_task();
+    __asm("NOP"); /* something to use as a breakpoint stop while looping */
   }
 }
 
